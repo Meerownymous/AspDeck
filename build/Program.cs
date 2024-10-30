@@ -29,7 +29,7 @@ public static class Program
 
 public static class Settings
 {
-    public static string ModuleName = "Tonga";
+    public static string ModuleName = "AspDeck";
     public static string Version = "0.1.0";
     public static string Configuration = "Release";
     public static string NugetReleaseToken = String.Empty;
