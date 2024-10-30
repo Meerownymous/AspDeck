@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspDeck", "src\AspDeck\AspD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspDeck.Tests", "tests\AspDeck.Tests\AspDeck.Tests.csproj", "{50F6A2C2-A12C-47EC-BBAC-9BC888C97301}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Build", "build\Build.csproj", "{FB6FD961-93EA-41EA-BD1A-E29AAB223AC3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{50F6A2C2-A12C-47EC-BBAC-9BC888C97301}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50F6A2C2-A12C-47EC-BBAC-9BC888C97301}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50F6A2C2-A12C-47EC-BBAC-9BC888C97301}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB6FD961-93EA-41EA-BD1A-E29AAB223AC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB6FD961-93EA-41EA-BD1A-E29AAB223AC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB6FD961-93EA-41EA-BD1A-E29AAB223AC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB6FD961-93EA-41EA-BD1A-E29AAB223AC3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
