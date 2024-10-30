@@ -1,0 +1,17 @@
+#------------------------------------------------------------#
+#     CI Build Configuration for master branch pre-release   #
+#------------------------------------------------------------#
+version: "{build}"
+image: Visual Studio 2022
+configuration: Release
+environment:
+  NUGET_TOKEN:
+    secure: yxrN4/Jcf+93s66kbBhU6F58yCLfSc5lbwBahCxAusT4fqIDHbvJZqi0NYdUmMxP
+# Do not build feature branch with open Pull Requests
+skip_branch_with_pr: true
+# Automatically register private account and/or project AppVeyor NuGet feeds.
+nuget:
+  account_feed: false
+build_script:
+- ps: .\build.ps1
+test: off
