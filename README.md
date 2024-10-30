@@ -7,22 +7,22 @@ Example:
 ```csharp
 
 await          
-  new WebApp( //this is the app container that wraps it up
-    new Url("http://localhost:5001"),
-    new Routes( //this object takes all the routes
-      new Get("/readme", async context =>
+  new WebApp(                                  //the app container that wraps it up
+    new Url("http://localhost:5001"),          //configures the given url
+    new Routes(                                //wraps all the routes
+      new Get("/readme", async context =>      //adds a get route
         await
-          new HttpResponse(HttpStatusCode.OK) //this uses WHyLL, another object oriented messaging library with http support. But you can use whatever you want.
+          new HttpResponse(HttpStatusCode.OK)  //uses WHyLL, another object oriented messaging library with http support. But you can use whatever you want.
               .WithBody("Use AspDeck!")
               .To(new AspResponse(context))
       ),
-      new Post("/stuff", async context =>
+      new Post("/stuff", async context =>      //adds a post route
         {
           // ... process stuff ...
           context.Response.StatusCode = 200;
           return context;
       )
   )
-).StartAsync();
+).StartAsync();                                //runs the webapp
 
 ```
