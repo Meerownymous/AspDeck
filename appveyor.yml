@@ -2,7 +2,6 @@
 #     CI Build Configuration for master branch pre-release   #
 #------------------------------------------------------------#
 version: "{build}"
-image: Previous Visual Studio 2022
 
 configuration: Release
 environment:
