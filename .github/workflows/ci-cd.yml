@@ -32,11 +32,11 @@ jobs:
       - name: Run Tests
         run: dotnet test --no-build --verbosity normal --configuration Release
 
-      - name: Upload Build Artifacts
+      - name: Upload NuGet Packages
         uses: actions/upload-artifact@v3
         with:
-          name: build-output
-          path: ./bin/Release/
+          name: nuget-packages
+          path: '**/*.nupkg'
   
   publish:
     name: Publish to NuGet
