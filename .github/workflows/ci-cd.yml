@@ -5,8 +5,13 @@ on:
     branches:
       - main
     tags:
-      - '*'
+      - 'v*'
   pull_request:
+
+env:
+  PROJECTS_TO_BUILD: |
+    src/AspDeck/AspDeck.csproj
+    tests/AspDeck.Tests/AspDeck.Tests.csproj
 
 jobs:
   build-and-test:
@@ -23,21 +28,42 @@ jobs:
           dotnet-version: '9.x'
 
       - name: Restore Dependencies
-        run: dotnet restore AspDeck.sln
+        run: |
+          for project in $PROJECTS_TO_BUILD; do
+            echo "Restoring dependencies for $project"
+            dotnet restore $project
+          done
+        shell: bash
 
-      - name: Build
-        run: dotnet build AspDeck.sln --no-restore --configuration Release --output ./artifacts
+      - name: Build Projects
+        run: |
+          for project in $PROJECTS_TO_BUILD; do
+            echo "Building $project"
+            dotnet build $project --no-restore --configuration Release --output ./artifacts
+          done
+        shell: bash
 
       - name: Debug Artifacts Directory
         run: |
-          find ./artifacts -type f -name "*.Tests.dll"
+          find ./artifacts -type f
         shell: bash
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: ./artifacts/
 
       - name: Run Tests
         run: |
-          find ./artifacts -type f -name "*.Tests.dll" | while read file; do
-            echo "Running tests for $file"
-            dotnet test "$file" --no-build --verbosity normal --configuration Release
+          for project in $PROJECTS_TO_BUILD; do
+            if [[ $project == *"Tests"* ]]; then
+              echo "Running tests for $project"
+              find ./artifacts -type f -name "*.Tests.dll" | while read file; do
+                echo "Testing $file"
+                dotnet test "$file" --no-build --verbosity normal --configuration Release
+              done
+            fi
           done
         shell: bash
 
@@ -48,10 +74,18 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.x'
+
       - name: Download Build Artifacts
         uses: actions/download-artifact@v3
         with:
           name: build-artifacts
 
       - name: Publish to NuGet
-        run: dotnet nuget push ./artifact/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+        run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
