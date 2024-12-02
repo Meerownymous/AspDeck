@@ -83,7 +83,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: nuget-package
-          path: ./artifacts
 
       - name: Publish to NuGet
-        run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+        run: dotnet nuget push ./*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
