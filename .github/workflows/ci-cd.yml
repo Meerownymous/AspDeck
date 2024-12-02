@@ -59,15 +59,15 @@ jobs:
           fetch-depth: 0
 
       - name: Get Current Tag
-        shell: pwsh
+        shell: bash
         run: |
-          $CURRENT_TAG = $(git describe --tags --abbrev=0)
-          echo "CURRENT_TAG=$CURRENT_TAG" | Out-File -FilePath $env:GITHUB_ENV -Append
+          CURRENT_TAG=$(git describe --tags --abbrev=0)
+          echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
 
       - name: Debug Current Tag
-        shell: pwsh
+        shell: bash
         run: |
-          echo "Current Tag: $env:CURRENT_TAG"
+          echo "Current Tag: $CURRENT_TAG"
 
       - name: Pack NuGet Package
         run: |
