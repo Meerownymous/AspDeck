@@ -23,27 +23,23 @@ jobs:
           dotnet-version: '9.x'
 
       - name: Restore Dependencies
-        run: dotnet restore
+        run: dotnet restore AspDeck.sln
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release --output ./artifact
+        run: dotnet build AspDeck.sln --no-restore --configuration Release --output ./artifacts
+
+      - name: Debug Artifacts Directory
+        run: |
+          find ./artifacts -type f -name "*.Tests.dll"
+        shell: bash
 
       - name: Run Tests
         run: |
-          for file in ./artifacts/**/*.Tests.dll; do
+          find ./artifacts -type f -name "*.Tests.dll" | while read file; do
             echo "Running tests for $file"
             dotnet test "$file" --no-build --verbosity normal --configuration Release
           done
         shell: bash
-
-      - name: Pack NuGet Package
-        run: dotnet pack --no-build --configuration Release --output ./artifact
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifacts
-          path: ./artifact
 
   publish:
     name: Publish to NuGet
