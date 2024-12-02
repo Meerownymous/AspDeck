@@ -58,10 +58,7 @@ jobs:
           for project in $PROJECTS_TO_BUILD; do
             if [[ $project != *"TEST"* ]]; then
               echo "Packing $(basename "$project" .csproj) from $project"
-              dotnet pack "$project" \
-                --no-build \
-                --configuration Release \
-                /p:PackageOutputPath=./artifacts
+              dotnet pack "$project" --no-build --configuration Release /p:PackageOutputPath=./artifacts
             fi
           done
         shell: bash
