@@ -53,10 +53,20 @@ jobs:
           done
         shell: bash
 
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+    
       - name: Get Current Tag
         id: get-tag
         run: |
-          echo "CURRENT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+          CURRENT_TAG=$(git describe --tags --abbrev=0)
+          echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
+    
+      - name: Debug Current Tag
+        run: |
+          echo "Current Tag: ${{ env.CURRENT_TAG }}"
 
       - name: Pack NuGet Package
         run: |
