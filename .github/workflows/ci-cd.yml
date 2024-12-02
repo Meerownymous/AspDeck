@@ -94,7 +94,7 @@ jobs:
         run: |
           for project in $PROJECTS_TO_BUILD; do
             if [[ $project != *"TEST"* ]]; then
-              project_name=$(basename $project .csproj)
+              project_name=$(basename $project.csproj)
               echo "Packing $project_name from $project"
               dotnet pack $project \
                 --no-build \
