@@ -4,6 +4,7 @@
 version: "{build}"
 image: Previous Visual Studio 2022
 
+
 configuration: Release
 environment:
   NUGET_TOKEN:
