@@ -63,6 +63,11 @@ jobs:
           done
         shell: bash
 
+      - name: Log Files Before Upload
+        run: |
+          echo "Files ready for upload:"
+          find ./artifacts -type f
+
       - name: Upload NuGet Package
         uses: actions/upload-artifact@v3
         with:
@@ -83,6 +88,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: nuget-package
+          path: ./
+
+      - name: Log Downloaded Artifacts
+        run: |
+          echo "Downloaded artifacts:"
+          find . -type f
 
       - name: Publish to NuGet
         run: dotnet nuget push ./*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
