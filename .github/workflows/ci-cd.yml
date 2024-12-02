@@ -4,10 +4,10 @@ on:
   push:
     branches:
       - main
-  pull_request:
-  push:
     tags:
-      - 'v*'
+      - '*'
+  pull_request:
+
 
 jobs:
   build-and-test:
@@ -21,7 +21,7 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.x'
+        dotnet-version: '9.x'
 
     - name: Restore Dependencies
       run: dotnet restore
@@ -45,7 +45,7 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.x'
+        dotnet-version: '9.x'
 
     - name: Restore Dependencies
       run: dotnet restore
