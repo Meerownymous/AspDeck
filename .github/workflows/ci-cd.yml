@@ -31,39 +31,46 @@ jobs:
         run: |
           for project in $PROJECTS_TO_BUILD; do
             echo "Restoring dependencies for $project"
-            dotnet restore $project
+            dotnet restore "$project"
           done
         shell: bash
 
       - name: Build Projects
         run: |
           for project in $PROJECTS_TO_BUILD; do
-            project_name=$(basename $project .csproj)
-            echo "Building $project into ./artifacts/$project_name"
-            dotnet build $project --no-restore --configuration Release --output ./artifacts/$project_name
+            echo "Building $project"
+            dotnet build "$project" --no-restore --configuration Release
           done
         shell: bash
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifacts
-          path: |
-            ./artifacts/
-            src/**/obj/
 
       - name: Run Tests
         run: |
           for project in $PROJECTS_TO_BUILD; do
             if [[ $project == *"TEST"* ]]; then
               echo "Running tests for $project"
-              find ./artifacts -type f -name "*.Tests.dll" | while read file; do
-                echo "Testing $file"
-                dotnet test "$file" --no-build --verbosity normal --configuration Release
-              done
+              dotnet test "$project" --no-build --verbosity normal --configuration Release
             fi
           done
         shell: bash
+
+      - name: Pack NuGet Package
+        run: |
+          for project in $PROJECTS_TO_BUILD; do
+            if [[ $project != *"TEST"* ]]; then
+              echo "Packing $(basename "$project" .csproj) from $project"
+              dotnet pack "$project" \
+                --no-build \
+                --configuration Release \
+                /p:PackageOutputPath="./artifacts"
+            fi
+          done
+        shell: bash
+
+      - name: Upload NuGet Package
+        uses: actions/upload-artifact@v3
+        with:
+          name: nuget-package
+          path: ./artifacts/*.nupkg
 
   publish:
     name: Publish to NuGet
@@ -75,36 +82,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '9.x'
-
-      - name: Download Build Artifacts
+      - name: Download NuGet Package
         uses: actions/download-artifact@v3
         with:
-          name: build-artifacts
-
-      - name: Debug Downloaded Artifacts
-        run: |
-          find ./artifacts -type f
-        shell: bash
-
-      - name: Pack NuGet Package from Artifacts
-        run: |
-          for project in $PROJECTS_TO_BUILD; do
-            if [[ $project != *"TEST"* ]]; then
-              project_name=$(basename "$project" | sed 's/\.csproj$//')
-              echo "Packing $project_name from $project"
-              dotnet pack "$project" \
-                --no-build \
-                --configuration Release \
-                --property:PackageOutputPath="./artifacts"
-            else
-              echo "Skipping test project $project"
-            fi
-          done
-        shell: bash
+          name: nuget-package
 
       - name: Publish to NuGet
         run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
