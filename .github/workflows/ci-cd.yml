@@ -29,7 +29,12 @@ jobs:
         run: dotnet build --no-restore --configuration Release --output ./artifact
 
       - name: Run Tests
-        run: dotnet test --no-build --verbosity normal --configuration Release
+        run: |
+          for file in ./artifacts/**/*.Tests.dll; do
+            echo "Running tests for $file"
+            dotnet test "$file" --no-build --verbosity normal --configuration Release
+          done
+        shell: bash
 
       - name: Pack NuGet Package
         run: dotnet pack --no-build --configuration Release --output ./artifact
