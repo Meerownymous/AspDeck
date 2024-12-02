@@ -64,9 +64,10 @@ jobs:
         shell: bash
 
       - name: Log Files Before Upload
+        shell: pwsh
         run: |
           echo "Files ready for upload:"
-          dir .\artifacts\ /b
+          Get-ChildItem -Path .\artifacts\ -File
 
       - name: Upload NuGet Package
         uses: actions/upload-artifact@v3
@@ -91,9 +92,10 @@ jobs:
           path: ./
 
       - name: Log Downloaded Artifacts
+        shell: pwsh
         run: |
           echo "Downloaded artifacts:"
-          dir .\ /b
+          Get-ChildItem -Path .\ -File
 
       - name: Publish to NuGet
         run: dotnet nuget push ./*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
