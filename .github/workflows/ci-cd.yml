@@ -38,20 +38,24 @@ jobs:
       - name: Build Projects
         run: |
           for project in $PROJECTS_TO_BUILD; do
-            echo "Building $project"
-            dotnet build $project --no-restore --configuration Release --output ./artifacts
+            project_name=$(basename $project .csproj)
+            echo "Building $project into ./artifacts/$project_name"
+            dotnet build $project --no-restore --configuration Release --output ./artifacts/$project_name
           done
         shell: bash
 
-      - name: Debug Artifacts Directory
-        run: |
-          find ./artifacts -type f
-        shell: bash
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            ./artifacts/
+            src/**/obj/
 
       - name: Run Tests
         run: |
           for project in $PROJECTS_TO_BUILD; do
-            if [[ $project == *"Tests"* ]]; then
+            if [[ $project == *"TEST"* ]]; then
               echo "Running tests for $project"
               find ./artifacts -type f -name "*.Tests.dll" | while read file; do
                 echo "Testing $file"
@@ -60,12 +64,6 @@ jobs:
             fi
           done
         shell: bash
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifacts
-          path: ./artifacts/
 
   publish:
     name: Publish to NuGet
@@ -86,7 +84,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-artifacts
-          path: ./artifacts
 
       - name: Debug Downloaded Artifacts
         run: |
@@ -96,8 +93,12 @@ jobs:
       - name: Pack NuGet Package
         run: |
           for project in $PROJECTS_TO_BUILD; do
-            echo "Packing $project"
-            dotnet pack $project --no-build --configuration Release --output ./artifacts
+            if [[ $project != *"TEST"* ]]; then
+              echo "Packing $project"
+              dotnet pack $project --no-build --configuration Release --output ./artifacts
+            else
+              echo "Skipping test project $project"
+            fi
           done
         shell: bash
 
