@@ -48,12 +48,6 @@ jobs:
           find ./artifacts -type f
         shell: bash
 
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifacts
-          path: ./artifacts/
-
       - name: Run Tests
         run: |
           for project in $PROJECTS_TO_BUILD; do
@@ -66,6 +60,12 @@ jobs:
             fi
           done
         shell: bash
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: ./artifacts/
 
   publish:
     name: Publish to NuGet
@@ -87,6 +87,18 @@ jobs:
         with:
           name: build-artifacts
 
+      - name: Debug Downloaded Artifacts
+        run: |
+          find ./artifacts -type f
+        shell: bash
+
+      - name: Pack NuGet Package
+        run: |
+          for project in $PROJECTS_TO_BUILD; do
+            echo "Packing $project"
+            dotnet pack $project --no-build --configuration Release --output ./artifacts
+          done
+        shell: bash
+
       - name: Publish to NuGet
         run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
-        
