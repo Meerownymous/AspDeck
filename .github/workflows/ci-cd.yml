@@ -65,42 +65,41 @@ jobs:
           done
         shell: bash
 
-  publish:
-    name: Publish to NuGet
-    runs-on: windows-latest
-    needs: build-and-test
-    if: startsWith(github.ref, 'refs/tags/')
+publish:
+  name: Publish to NuGet
+  runs-on: windows-latest
+  needs: build-and-test
+  if: startsWith(github.ref, 'refs/tags/')
+  
+  steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.x'
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '9.x'
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: build-artifacts
 
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: build-artifacts
+    - name: Debug Downloaded Artifacts
+      run: |
+        find ./artifacts -type f
+      shell: bash
 
-      - name: Debug Downloaded Artifacts
-        run: |
-          find ./artifacts -type f
-        shell: bash
+    - name: Pack NuGet Package from Artifacts
+      run: |
+        find ./artifacts -type f -name "*.dll" | while read dll; do
+          if [[ $dll != *"Tests"* ]]; then
+            project_name=$(basename $(dirname $dll))
+            echo "Packing $project_name from $dll"
+            dotnet pack --no-build --configuration Release --output ./artifacts $(dirname $dll)/$project_name.csproj
+          fi
+        done
+      shell: bash
 
-      - name: Pack NuGet Package
-        run: |
-          for project in $PROJECTS_TO_BUILD; do
-            if [[ $project != *"TEST"* ]]; then
-              echo "Packing $project"
-              dotnet pack $project --no-build --configuration Release --output ./artifacts
-            else
-              echo "Skipping test project $project"
-            fi
-          done
-        shell: bash
-
-      - name: Publish to NuGet
-        run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+    - name: Publish to NuGet
+      run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
