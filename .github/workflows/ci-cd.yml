@@ -57,16 +57,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-    
+
       - name: Get Current Tag
-        id: get-tag
+        shell: pwsh
         run: |
-          CURRENT_TAG=$(git describe --tags --abbrev=0)
-          echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
-    
+          $CURRENT_TAG = $(git describe --tags --abbrev=0)
+          echo "CURRENT_TAG=$CURRENT_TAG" | Out-File -FilePath $env:GITHUB_ENV -Append
+
       - name: Debug Current Tag
+        shell: pwsh
         run: |
-          echo "Current Tag: ${{ env.CURRENT_TAG }}"
+          echo "Current Tag: $env:CURRENT_TAG"
 
       - name: Pack NuGet Package
         run: |
