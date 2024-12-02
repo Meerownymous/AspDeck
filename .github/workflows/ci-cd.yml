@@ -63,7 +63,7 @@ jobs:
           for project in $PROJECTS_TO_BUILD; do
             if [[ $project != *"TEST"* ]]; then
               echo "Packing $(basename "$project" .csproj) from $project with version $CURRENT_TAG"
-              dotnet pack "$project" --no-build --configuration Release --output "./artifacts" /p:Version=$CURRENT_TAG
+              dotnet pack "$project" --no-build --configuration Release --output "./artifacts" --version-suffix $CURRENT_TAG
             fi
           done
         shell: bash
