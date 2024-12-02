@@ -61,7 +61,7 @@ jobs:
               dotnet pack "$project" \
                 --no-build \
                 --configuration Release \
-                /p:PackageOutputPath="./artifacts"
+                /p:PackageOutputPath=./artifacts
             fi
           done
         shell: bash
