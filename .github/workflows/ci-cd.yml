@@ -99,8 +99,8 @@ jobs:
               dotnet pack $project \
                 --no-build \
                 --configuration Release \
-                /p:BaseOutputPath=./artifacts/$project_name/ \
-                --output ./artifacts
+                /p:BaseOutputPath="./artifacts/$project_name" \
+                /p:PackageOutputPath="./artifacts"
             else
               echo "Skipping test project $project"
             fi
