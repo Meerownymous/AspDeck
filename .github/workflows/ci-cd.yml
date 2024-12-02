@@ -124,6 +124,7 @@ jobs:
           Get-ChildItem -Path .\ -File
 
       - name: Publish to NuGet
+        shell: bash
         run: |
           for nupkg in ./*.nupkg; do
             echo "Publishing $nupkg"
