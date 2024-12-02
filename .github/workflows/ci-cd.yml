@@ -50,7 +50,7 @@ jobs:
           name: build-artifacts
           path: |
             ./artifacts/
-            src/**/obj/
+            src/**/obj/  # Ensure metadata like project.assets.json is included.
 
       - name: Run Tests
         run: |
@@ -65,41 +65,42 @@ jobs:
           done
         shell: bash
 
-publish:
-  name: Publish to NuGet
-  runs-on: windows-latest
-  needs: build-and-test
-  if: startsWith(github.ref, 'refs/tags/')
-  
-  steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+  publish:
+    name: Publish to NuGet
+    runs-on: windows-latest
+    needs: build-and-test
+    if: startsWith(github.ref, 'refs/tags/')
 
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '9.x'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Download Build Artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: build-artifacts
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.x'
 
-    - name: Debug Downloaded Artifacts
-      run: |
-        find ./artifacts -type f
-      shell: bash
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
 
-    - name: Pack NuGet Package from Artifacts
-      run: |
-        find ./artifacts -type f -name "*.dll" | while read dll; do
-          if [[ $dll != *"Tests"* ]]; then
-            project_name=$(basename $(dirname $dll))
-            echo "Packing $project_name from $dll"
-            dotnet pack --no-build --configuration Release --output ./artifacts $(dirname $dll)/$project_name.csproj
-          fi
-        done
-      shell: bash
+      - name: Debug Downloaded Artifacts
+        run: |
+          find ./artifacts -type f
+        shell: bash
 
-    - name: Publish to NuGet
-      run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      - name: Pack NuGet Package from Artifacts
+        run: |
+          find ./artifacts -type f -name "*.dll" | while read dll; do
+            if [[ $dll != *"Tests"* ]]; then
+              project_name=$(basename $(dirname $dll))
+              project_dir=$(dirname $(dirname $dll))
+              echo "Packing $project_name from $project_dir"
+              dotnet pack $project_dir/$project_name.csproj --no-build --configuration Release --output ./artifacts
+            fi
+          done
+        shell: bash
+
+      - name: Publish to NuGet
+        run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
