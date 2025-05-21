@@ -21,7 +21,7 @@ public sealed class WebAppTests
                     new Get("/unittest", async context =>
                         await
                             new HttpResponse(HttpStatusCode.OK)
-                                .WithBody(new AsInputStream("success"))
+                                .WithBody(new AsStream("success"))
                                 .To(new AspResponse(context))
                     )
                 ),
