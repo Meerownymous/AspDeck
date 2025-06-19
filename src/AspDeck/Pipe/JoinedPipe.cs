@@ -17,7 +17,7 @@ public sealed class JoinedPipe<TPayload>(IEnumerable<IPipe<TPayload>> pipes) : P
     })
 )
 {
-    public JoinedPipe(params IPipe<TPayload>[] pipes) : this(AsEnumerable._(pipes))
+    public JoinedPipe(params IPipe<TPayload>[] pipes) : this(pipes.AsEnumerable())
     { }
 }
 

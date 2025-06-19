@@ -36,7 +36,7 @@ public sealed class WebAppTests
                 "success",
                 await new WHyLL.Http.Request.Get("http://localhost:5001/unittest")
                     .To(new HttpWire(new HttpClient()))
-                    .To(new BodyAsText())
+                    .To(new BodyAsString())
             );
         }
         finally

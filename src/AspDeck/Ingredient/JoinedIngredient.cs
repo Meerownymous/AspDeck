@@ -23,6 +23,6 @@ public sealed class JoinedIngredient(IEnumerable<IIngredient> inputs) : Ingredie
     )
 )
 {
-    public JoinedIngredient(params IIngredient[] inputs) : this(AsEnumerable._(inputs))
+    public JoinedIngredient(params IIngredient[] inputs) : this(inputs.AsEnumerable())
     { }
 }
