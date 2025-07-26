@@ -1,20 +1,37 @@
 using AspDeck.Ingredient;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace AspDeck.Host;
-
 /// <summary>
-/// WebApplication Logger Building Pipe.
+/// Adds logging to the webapp.
 /// </summary>
-public sealed class Logging(Func<ILoggingBuilder,ILoggingBuilder> pipe) : 
-    IngredientEnvelope(
-        new AsIngredient(
-            builder =>
-            {
-                pipe(builder.Logging);
-                return builder;
-            }
-        )
-)
-{ }
+public sealed class Logging : IngredientEnvelope
+{
+    /// <summary>
+    /// Adds logging to the webapp.
+    /// </summary>
+    public Logging(ILogger logger) : this(pipeWebAppBuilder: builder =>
+    {
+        builder.Services.AddSingleton(logger);
+        return builder;
+    })
+    { }
 
+    /// <summary>
+    /// Adds logging to the webapp.
+    /// </summary>
+    public Logging(Func<ILoggingBuilder, ILoggingBuilder> pipeLoggingBuilder) : base(
+        new AsIngredient(builder =>
+        {
+            _ = pipeLoggingBuilder(builder.Logging);
+            return builder;
+        })
+    )
+    { }
+    
+    private Logging(Func<WebApplicationBuilder, WebApplicationBuilder> pipeWebAppBuilder) : base(
+        new AsIngredient(pipeWebAppBuilder)    
+    )
+    { }
+}
